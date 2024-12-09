@@ -29,8 +29,17 @@ def brain_extra(output_path, name):
     except subprocess.CalledProcessError as e:
         print(f"Error during command execution: {e}")
 
+def robustfov(mri, out_path):
+    try:
+        subprocess.run(['robustfov', '-i', mri, '-r', out_path],
+                    check=True)
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error during command execution: {e}")
+
 def process(input_path, ref, output_path, brain_extran, single=True):
     name = input_path.split("/")[-1]
+    name_nosubfix = name.split('.')[0]
     print(f"The {name} file is processing.")
     
     if single:
@@ -39,14 +48,15 @@ def process(input_path, ref, output_path, brain_extran, single=True):
         registration_result = ants.registration(fixed=ref, moving=mri, type_of_transform='SyN')
 
         out = registration_result['warpedmovout']
-        out.to_file(os.path.join(output_path, name))
+        out.to_file(os.path.join(output_path, name_nosubfix + "reg.niigz"))
 
+        print("Robustfov phase!!!")
+        robustfov(os.path.join(output_path, name_nosubfix + "reg.niigz"), output_path)
+        
         if brain_extran:
             brain_extra(output_path, name)
             
     else:
-        name_nosubfix = name.split('.')[0]
-
         new_output = os.path.join(output_path, name_nosubfix)
 
         os.makedirs(new_output)
@@ -56,7 +66,10 @@ def process(input_path, ref, output_path, brain_extran, single=True):
         registration_result = ants.registration(fixed=ref, moving=mri, type_of_transform='SyN')
 
         out = registration_result['warpedmovout']
-        out.to_file(os.path.join(new_output, name))
+        out.to_file(os.path.join(new_output, name_nosubfix + "reg.niigz"))
+
+        print("Robustfov phase!!!")
+        robustfov(os.path.join(new_output, name_nosubfix + "reg.niigz"), os.path.join(new_output, name))
 
         if brain_extran:
             brain_extra(new_output, name)
@@ -91,7 +104,6 @@ if __name__ == '__main__':
         mri_list = os.listdir(input_path)
 
         for mri in tqdm(mri_list):
-
-            process(mri, ref, output_path, brain_extran, single=False)
+            process(os.path.join(input_path, mri), ref, output_path, brain_extran, single=False)
 
 
