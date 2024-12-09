@@ -29,19 +29,19 @@ def brain_extra(output_path, name):
     except subprocess.CalledProcessError as e:
         print(f"Error during command execution: {e}")
 
-def process(input_path, ref, output_path, single=True):
+def process(input_path, ref, output_path, brain_extran, single=True):
     name = input_path.split("/")[-1]
-    print(f"The {name.split('.'[0])} file is processing.")
+    print(f"The {name} file is processing.")
     
     if single:
-        print()
         mri = ants.image_read(input_path)
+        print("Registration pahse!!!")
         registration_result = ants.registration(fixed=ref, moving=mri, type_of_transform='SyN')
 
         out = registration_result['warpedmovout']
         out.to_file(os.path.join(output_path, name))
 
-        if brain_extra:
+        if brain_extran:
             brain_extra(output_path, name)
             
     else:
@@ -51,13 +51,14 @@ def process(input_path, ref, output_path, single=True):
 
         os.makedirs(new_output)
 
+        print("Registration pahse!!!")
         mri = ants.image_read(input_path)
         registration_result = ants.registration(fixed=ref, moving=mri, type_of_transform='SyN')
 
         out = registration_result['warpedmovout']
         out.to_file(os.path.join(new_output, name))
 
-        if brain_extra:
+        if brain_extran:
             brain_extra(new_output, name)
 
         
@@ -74,7 +75,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     input_path = args.inputs
     output_path = args.outputs
-    brain_extra = args.brain_extraction
+    brain_extran = args.brain_extraction
 
     assert os.path.exists(input_path), 'input file doesn\'t exist'
 
@@ -84,13 +85,13 @@ if __name__ == '__main__':
 
     if os.path.isfile(input_path):
 
-        process(input_path, ref, output_path)
+        process(input_path, ref, output_path, brain_extran)
 
     else:
         mri_list = os.listdir(input_path)
 
         for mri in tqdm(mri_list):
 
-            process(mri, ref, output_path, single=False)
+            process(mri, ref, output_path, brain_extran, single=False)
 
 
