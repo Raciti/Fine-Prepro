@@ -1,5 +1,5 @@
 # ⚙️ Fine-Prepro 
-Preprocessing of MRI for better use in medical tools or AI activities.
+Preprocessing of MRI for better use in medical tools or AI activities. In the image below only the axial axis result is shown, but the pipeline works on 3D images
 ![Results pipeline](https://github.com/Raciti/Fine-Preprocessing/blob/main/utils/Fine-prepro.png)
 
 ## Requirements
