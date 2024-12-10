@@ -22,7 +22,7 @@ def brain_extraction(output_path, name, namer=''):
 
     try:
         print("Creation brain_skull A")
-        subprocess.run(['fslmaths', f"{os.path.join(output_path, name.split('.')[0])}_brain_mask.nii.gz", '-edge', f"{os.path.join(output_path, name.split('.')[0])}_brain_mask.nii.gz"], 
+        subprocess.run(['fslmaths', f"{os.path.join(output_path, name.split('.')[0])}_brain_mask.nii.gz", '-edge', f"{os.path.join(output_path, name.split('.')[0])}_brain_skull.nii.gz"], 
                     check=True)
 
     except subprocess.CalledProcessError as e:
@@ -30,8 +30,8 @@ def brain_extraction(output_path, name, namer=''):
         exit()
 
     try:
-        print("Normalizzation brain_skull A")
-        subprocess.run(['fslmaths', f"{os.path.join(output_path, name.split('.')[0])}_brain_mask.nii.gz", '-bin', '-mul', '100', f"{os.path.join(output_path, name.split('.')[0])}_brain_mask.nii.gz"], 
+        print("Normalisation brain_skull A")
+        subprocess.run(['fslmaths', f"{os.path.join(output_path, name.split('.')[0])}_brain_skull.nii.gz", '-bin', '-mul', '100', f"{os.path.join(output_path, name.split('.')[0])}_brain_skull.nii.gz"], 
                     check=True)
 
     except subprocess.CalledProcessError as e:
@@ -60,7 +60,8 @@ def percnorm(arr, lperc, uperc):
     arr[arr < lowerbound] = lowerbound
     return arr
 
-def normalizzation(file_path, o_path, lperc, uperc):
+def normalisation(file_path, o_path, lperc, uperc):
+    print("Normalisation MRI")
     mri = nib.load(file_path)
     norm_mri = percnorm_nifti(mri, lperc, uperc)
     nib.save(norm_mri, o_path)
@@ -84,7 +85,7 @@ def process(input_path, output_path, norm, brain_extran, robust, single=True, lp
 
         if norm:
             name_norm = name_nosubfix + "_norm.nii.gz"
-            normalizzation(os.path.join(output_path, name_reg), os.path.join(output_path, name_norm), lperc, uperc)
+            normalisation(os.path.join(output_path, name_reg), os.path.join(output_path, name_norm), lperc, uperc)
 
         if robust:
             name_rob = name_nosubfix + '_rob.nii.gz'
@@ -108,7 +109,7 @@ def process(input_path, output_path, norm, brain_extran, robust, single=True, lp
 
         if norm:
             name_norm = name_nosubfix + "_norm.nii.gz"
-            normalizzation(os.path.join(new_output, name_reg), os.path.join(new_output, name_norm), lperc, uperc)
+            normalisation(os.path.join(new_output, name_reg), os.path.join(new_output, name_norm), lperc, uperc)
 
         if robust:
             name_rob = name_nosubfix + '_rob.nii.gz'
