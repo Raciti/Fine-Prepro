@@ -1,5 +1,6 @@
 # ⚙️ Fine-Prepro 
 Preprocessing of MRI for better use in medical tools or AI activities.
+![Results pipeline](./utils/Fine-Prepro.png)
 
 ## Requirements
 The following software must be installed to use Fine-Prepro:
