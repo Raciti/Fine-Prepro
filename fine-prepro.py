@@ -59,7 +59,7 @@ def percnorm(arr, lperc, uperc):
     arr[arr < lowerbound] = lowerbound
     return arr
 
-def normalizzazion(file_path, o_path, lperc, uperc):
+def normalizzation(file_path, o_path, lperc, uperc):
     mri = nib.load(file_path)
     norm_mri = percnorm_nifti(mri, lperc, uperc)
     nib.save(norm_mri, o_path)
@@ -83,7 +83,7 @@ def process(input_path, output_path, norm, brain_extran, robust, single=True, lp
 
         if norm:
             name_norm = name_nosubfix + "_norm.nii.gz"
-            normalizzazion(os.path.join(output_path, name_reg), os.path.join(output_path, name_norm), lperc, uperc)
+            normalizzation(os.path.join(output_path, name_reg), os.path.join(output_path, name_norm), lperc, uperc)
 
         if robust:
             name_rob = name_nosubfix + '_rob.nii.gz'
@@ -107,7 +107,7 @@ def process(input_path, output_path, norm, brain_extran, robust, single=True, lp
 
         if norm:
             name_norm = name_nosubfix + "_norm.nii.gz"
-            normalizzazion(os.path.join(new_output, name_reg), os.path.join(new_output, name_norm), lperc, uperc)
+            normalizzation(os.path.join(new_output, name_reg), os.path.join(new_output, name_norm), lperc, uperc)
 
         if robust:
             name_rob = name_nosubfix + '_rob.nii.gz'
@@ -128,6 +128,9 @@ if __name__ == '__main__':
     parser.add_argument('--robustfov', type=int, default=1, help="This flag hallows use of robustfov, whit center the brain, eliminating slices from the z axis (default use robustfov).")
     parser.add_argument('--brain_extraction', type=int, default=1, help="If this parameter is setup to 1 the process will produce the brain extracion (default = 1 yes).")
 
+    norm_group = parser.add_argument_group("Normalizzation optzions")
+    norm_group.add_argument('--lperc', type=int, default=0, help="Indicate the lower percentile number you want to consider (default 0).")
+    norm_group.add_argument('--uperc', type=int, default=99, help="Indicate the upper percentile number you want to consider (default 99).")
 
     args = parser.parse_args()
     input_path = args.inputs
@@ -136,10 +139,15 @@ if __name__ == '__main__':
     robust = args.robustfov
     brain_extran = args.brain_extraction
 
+    lperc = args.perc
+    uperc = args.uperc
+
     assert os.path.exists(input_path), 'input file doesn\'t exist'
     assert norm in (0,1), 'norm can be 0 or 1' 
     assert robust in (0,1), 'robustfov can be 0 or 1' 
     assert brain_extran in (0,1), 'brain_extraction can be 0 or 1' 
+    assert lperc in(0,99), 'lperc must be between o and 99'
+    assert uperc in(0,99), 'uperc must be between o and 99'
 
     os.makedirs(output_path, exist_ok=True)
 
@@ -151,6 +159,6 @@ if __name__ == '__main__':
         mri_list = os.listdir(input_path)
 
         for mri in tqdm(mri_list):
-            process(os.path.join(input_path, mri), output_path, norm, brain_extran,robust, single=False)
+            process(os.path.join(input_path, mri), output_path, norm, brain_extran,robust, lperc=lperc, uperc=uperc, single=False)
 
 
