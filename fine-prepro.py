@@ -1,3 +1,4 @@
+from multiprocessing import Pool
 import ants
 import argparse
 import os
@@ -74,7 +75,7 @@ def process(input_path, output_path, norm, brain_extran, robust, single=True, lp
     
     if single:
         mri = ants.image_read(input_path)
-        print("Registration pahse!!!")
+        print("Registration phase!!!")
         registration_result = ants.registration(fixed=ref, moving=mri, type_of_transform='SyN')
 
         out = registration_result['warpedmovout']
@@ -117,13 +118,13 @@ def process(input_path, output_path, norm, brain_extran, robust, single=True, lp
             brain_extraction(new_output, name, name_rob) if robust else brain_extraction(new_output, name) 
 
         
-
-
+NPROC = os.cpu_count()
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description="Fine-Preprocessing")
+    parser = argparse.ArgumentParser(description="Fine-Prepro")
     parser.add_argument('--inputs', type=str, required=True, help="The input can be a single path or a folder containing T1 MRIs.")
     parser.add_argument('--outputs', type=str, required=True, help="The output it must be a path for a folder, if folder don't exist one will be created.")
+    parser.add_argument('--threads', type=int, default=NPROC, help="Threads (default: number of cores).")
     parser.add_argument('--norm', type=int, default=0, help="Remove outlier intensities from a brain component, similar to Tukey's fences method.")
     parser.add_argument('--robustfov', type=int, default=1, help="This flag hallows use of robustfov, whit center the brain, eliminating slices from the z axis (default use robustfov).")
     parser.add_argument('--brain_extraction', type=int, default=1, help="If this parameter is setup to 1 the process will produce the brain extracion (default = 1 yes).")
@@ -135,11 +136,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
     input_path = args.inputs
     output_path = args.outputs
+    threads = args.threads
     norm = args.norm
     robust = args.robustfov
     brain_extran = args.brain_extraction
 
-    lperc = args.perc
+    lperc = args.lperc
     uperc = args.uperc
 
     assert os.path.exists(input_path), 'input file doesn\'t exist'
@@ -153,12 +155,12 @@ if __name__ == '__main__':
 
     if os.path.isfile(input_path):
 
-        process(input_path, output_path, norm, brain_extran, robust)
+        process(input_path, output_path, norm, brain_extran, robust, False, lperc, uperc)
 
     else:
         mri_list = os.listdir(input_path)
 
-        for mri in tqdm(mri_list):
-            process(os.path.join(input_path, mri), output_path, norm, brain_extran,robust, lperc=lperc, uperc=uperc, single=False)
-
-
+        with Pool(processes=threads) as pool:
+            for _ in tqdm(pool.starmap(process, [(os.path.join(input_path, mri), output_path, norm, brain_extran, robust, False, lperc, uperc) for mri in mri_list]), total=len(mri_list), desc="Processing files"):
+                pass
+    
