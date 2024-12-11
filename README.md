@@ -60,6 +60,6 @@ The outuput (`--outputs`) must be a path to a folder, if it does't exist it will
 | Normalization   |   |  `python` |
 | ROI   | robustfov  | `FSL`   |
 | Skull-stripping  | mri_synthstrip  |  `ANTs`  |
-| Brain-mask   |   |  `python`  |
+| Brain-skull   |   |  `python`  |
 
 Where it says `python` means that code was used to perform the task
