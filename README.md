@@ -1,7 +1,7 @@
 # ⚙️ Fine-Prepro 
 Preprocessing of MRI for better use in medical tools or AI activities. <br> <br>
 In the image below only the axial axis result is shown, but the pipeline works on 3D images.
-![Results pipeline](https://github.com/Raciti/Fine-Preprocessing/blob/main/utils/Fine-prepro.png)
+![Results pipeline](https://github.com/Raciti/Fine-Prepro/blob/main/utils/Fine-prepro.png)
 
 ## Requirements
 The following software must be installed to use Fine-Prepro:
@@ -60,6 +60,6 @@ The outuput (`--outputs`) must be a path to a folder, if it does't exist it will
 | Normalization   |   |  `python` |
 | ROI   | robustfov  | `FSL`   |
 | Skull-stripping  | mri_synthstrip  |  `ANTs`  |
-| Brain-mask   |   |  `python`  |
+| Brain-skull   |   |  `python`  |
 
 Where it says `python` means that code was used to perform the task
