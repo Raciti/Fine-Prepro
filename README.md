@@ -39,7 +39,7 @@ Normalizzation optzions:
 
 
 The input (`--inputs`) can be:
-* a path to nii.gz imaga
+* a path to nii.gz image
   
 ```
 ./path/to/.nii.gz
