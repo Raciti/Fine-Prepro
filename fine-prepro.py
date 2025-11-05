@@ -77,7 +77,7 @@ def process(input_path, output_path, norm, brain_extran, robust, single=True, lp
     if single:
         mri = ants.image_read(input_path)
         print("Registration phase!!!")
-        registration_result = ants.registration(fixed=ref, moving=mri, type_of_transform='SyN')
+        registration_result = ants.registration(fixed=ref, moving=mri, type_of_transform='Affine')
 
         out = registration_result['warpedmovout']
         name_reg = name_nosubfix + "_reg.nii.gz"
